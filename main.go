@@ -2,18 +2,18 @@ package main
 
 import "fmt"
 
+func concat(s1 string, s2 string) string {
+	return s1 + s2
+}
+
+// don't touch below this line
+
 func main() {
-	var smsSendingLimit int
-	var costPerSMS float64
-	var hasPermission bool
-	var username string
+	test("Lane,", " happy birthday!")
+	test("Zuck,", " hope that Metaverse thing works out")
+	test("Go", " is fantastic")
+}
 
-	fmt.Printf(
-		"%v %f %v %q\n",
-		smsSendingLimit,
-		costPerSMS,
-		hasPermission,
-		username,
-	)
-
+func test(s1 string, s2 string) {
+	fmt.Println(concat(s1, s2))
 }
