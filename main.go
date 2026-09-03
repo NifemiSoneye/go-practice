@@ -1,13 +1,54 @@
 package main
 
-import "fmt"
+func getExpenseReport(e expense) (string, float64) {
+	em , ok := e.(email)
 
-type authenticationInfo struct {
-	username string
-	password string
+	if ok {
+		return em.toAddress , em.cost()
+	}
+	s, ok := e.(sms)
+
+	if ok {
+		return s.toPhoneNumber , s.cost()
+	}
+
+	return "" , 0.0
 }
 
-// create the method below
-func (authi authenticationInfo) getBasicAuth() string {
-	return fmt.Sprintf("Authroization : Basic %s : %s" , authi.username , authi.password)
+// don't touch below this line
+
+type expense interface {
+	cost() float64
+}
+
+type email struct {
+	isSubscribed bool
+	body         string
+	toAddress    string
+}
+
+type sms struct {
+	isSubscribed  bool
+	body          string
+	toPhoneNumber string
+}
+
+type invalid struct{}
+
+func (em email) cost() float64 {
+	if !em.isSubscribed {
+		return float64(len(em.body)) * .05
+	}
+	return float64(len(em.body)) * .01
+}
+
+func (sm sms) cost() float64 {
+	if !sm.isSubscribed {
+		return float64(len(sm.body)) * .1
+	}
+	return float64(len(sm.body)) * .03
+}
+
+func (inv invalid) cost() float64 {
+	return 0.0
 }
