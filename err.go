@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 )
 
 type divideError struct {
@@ -18,7 +17,3 @@ func divide(dividend, divisor float64) (float64, error) {
 	return dividend / divisor, nil
 }
 
-func main() {
-	value , message := divide(16 , 0)
-	fmt.Println(value , message)
-}
