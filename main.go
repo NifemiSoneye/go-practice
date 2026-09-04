@@ -1,18 +1,16 @@
 package main
 
 func getExpenseReport(e expense) (string, float64) {
-	em , ok := e.(email)
-
-	if ok {
-		return em.toAddress , em.cost()
-	}
-	s, ok := e.(sms)
-
-	if ok {
-		return s.toPhoneNumber , s.cost()
-	}
-
+	switch v:= e.(type) {
+	case email :
+		return v.toAddress , v.cost()
+		case sms :
+	return v.toPhoneNumber , v.cost()
+	default :
 	return "" , 0.0
+	}
+
+	
 }
 
 // don't touch below this line
@@ -35,20 +33,20 @@ type sms struct {
 
 type invalid struct{}
 
-func (em email) cost() float64 {
-	if !em.isSubscribed {
-		return float64(len(em.body)) * .05
+func (e email) cost() float64 {
+	if !e.isSubscribed {
+		return float64(len(e.body)) * .05
 	}
-	return float64(len(em.body)) * .01
+	return float64(len(e.body)) * .01
 }
 
-func (sm sms) cost() float64 {
-	if !sm.isSubscribed {
-		return float64(len(sm.body)) * .1
+func (s sms) cost() float64 {
+	if !s.isSubscribed {
+		return float64(len(s.body)) * .1
 	}
-	return float64(len(sm.body)) * .03
+	return float64(len(s.body)) * .03
 }
 
-func (inv invalid) cost() float64 {
+func (i invalid) cost() float64 {
 	return 0.0
 }
