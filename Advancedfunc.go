@@ -1,91 +1,50 @@
 package main
 
-import (
-	"fmt"
-	"sort"
-)
+import "fmt"
 
-const (
-	logDeleted  = "user deleted"
-	logNotFound = "user not found"
-	logAdmin    = "admin deleted"
-)
-
-func logAndDelete(users map[string]user, name string) (log string) {
-	defer delete(users, name)
-	user, ok := users[name]
-	if !ok {
-		
-		return logNotFound
+func adder() func(int) int {
+	sum := 0 
+	return func (x int) int {
+		sum += x
+		return sum
 	}
-	if user.admin {
-		return logAdmin
-	}
-	return logDeleted
 }
 
 // don't touch below this line
 
-type user struct {
-	name   string
-	number int
-	admin  bool
+type emailBill struct {
+	costInPennies int
 }
 
-func test(users map[string]user, name string) {
-	fmt.Printf("Attempting to delete %s...\n", name)
+func test(bills []emailBill) {
 	defer fmt.Println("====================================")
-	log := logAndDelete(users, name)
-	fmt.Println("Log:", log)
+	countAdder, costAdder := adder(), adder()
+	for _, bill := range bills {
+		fmt.Printf("You've sent %d emails and it has cost you %d cents\n", countAdder(1), costAdder(bill.costInPennies))
+	}
 }
 
 func main() {
-	users := map[string]user{
-		"john": {
-			name:   "john",
-			number: 18965554631,
-			admin:  true,
-		},
-		"elon": {
-			name:   "elon",
-			number: 19875556452,
-			admin:  true,
-		},
-		"breanna": {
-			name:   "breanna",
-			number: 98575554231,
-			admin:  false,
-		},
-		"kade": {
-			name:   "kade",
-			number: 10765557221,
-			admin:  false,
-		},
-	}
+	test([]emailBill{
+		{45},
+		{32},
+		{43},
+		{12},
+		{34},
+		{54},
+	})
 
-	fmt.Println("Initial users:")
-	usersSorted := []string{}
-	for name := range users {
-		usersSorted = append(usersSorted, name)
-	}
-	sort.Strings(usersSorted)
-	for _, name := range usersSorted {
-		fmt.Println(" -", name)
-	}
-	fmt.Println("====================================")
+	test([]emailBill{
+		{12},
+		{12},
+		{976},
+		{12},
+		{543},
+	})
 
-	test(users, "john")
-	test(users, "santa")
-	test(users, "kade")
-
-	fmt.Println("Final users:")
-	usersSorted = []string{}
-	for name := range users {
-		usersSorted = append(usersSorted, name)
-	}
-	sort.Strings(usersSorted)
-	for _, name := range usersSorted {
-		fmt.Println(" -", name)
-	}
-	fmt.Println("====================================")
-} 
+	test([]emailBill{
+		{743},
+		{13},
+		{8},
+	})
+}
