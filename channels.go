@@ -1,34 +1,103 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+	"time"
+)
 
-func addEmailsToQueue(emails []string) chan string {
-	emailsToSend := make(chan string , len(emails))
-	for _, email := range emails {
-		emailsToSend <- email
+func logMessages(chEmails, chSms chan string) {
+	for {
+		select {
+		case email , ok := <- chEmails :
+			if !ok {
+				return
+			}
+			logEmail(email)
+		case sms , ok := <- chSms :
+		if !ok {
+			return
+		}
+		logSms(sms)
+		}
 	}
-	return emailsToSend
 }
 
-// TEST SUITE - Don't Touch Below This Line
+// TEST SUITE - Don't touch below this line
 
-func sendEmails(batchSize int, ch chan string) {
-	for i := 0; i < batchSize; i++ {
-		email := <-ch
-		fmt.Println("Sending email:", email)
-	}
+func logSms(sms string) {
+	fmt.Println("SMS:", sms)
 }
 
-func test(emails ...string) {
-	fmt.Printf("Adding %v emails to queue...\n", len(emails))
-	ch := addEmailsToQueue(emails)
-	fmt.Println("Sending emails...")
-	sendEmails(len(emails), ch)
-	fmt.Println("==========================================")
+func logEmail(email string) {
+	fmt.Println("Email:", email)
+}
+
+func test(sms []string, emails []string) {
+	fmt.Println("Starting...")
+
+	chSms, chEmails := sendToLogger(sms, emails)
+
+	logMessages(chEmails, chSms)
+	fmt.Println("===============================")
 }
 
 func main() {
-	test("Hello John, tell Kathy I said hi", "Whazzup bruther")
-	test("I find that hard to believe.", "When? I don't know if I can", "What time are you thinking?")
-	test("She says hi!", "Yeah its tomorrow. So we're good.", "Cool see you then!", "Bye!")
+	rand.Seed(0)
+	test(
+		[]string{
+			"hi friend",
+			"What's going on?",
+			"Welcome to the business",
+			"I'll pay you to be my friend",
+		},
+		[]string{
+			"Will you make your appointment?",
+			"Let's be friends",
+			"What are you doing?",
+			"I can't believe you've done this.",
+		},
+	)
+	test(
+		[]string{
+			"this song slaps hard",
+			"yooo hoooo",
+			"i'm a big fan",
+		},
+		[]string{
+			"What do you think of this song?",
+			"I hate this band",
+			"Can you believe this song?",
+		},
+	)
+}
+
+func sendToLogger(sms, emails []string) (chSms, chEmails chan string) {
+	chSms = make(chan string)
+	chEmails = make(chan string)
+	go func() {
+		for i := 0; i < len(sms) && i < len(emails); i++ {
+			done := make(chan struct{})
+			s := sms[i]
+			e := emails[i]
+			t1 := time.Millisecond * time.Duration(rand.Intn(1000))
+			t2 := time.Millisecond * time.Duration(rand.Intn(1000))
+			go func() {
+				time.Sleep(t1)
+				chSms <- s
+				done <- struct{}{}
+			}()
+			go func() {
+				time.Sleep(t2)
+				chEmails <- e
+				done <- struct{}{}
+			}()
+			<-done
+			<-done
+			time.Sleep(10 * time.Millisecond)
+		}
+		close(chSms)
+		close(chEmails)
+	}()
+	return chSms, chEmails
 }
