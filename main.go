@@ -2,7 +2,7 @@ package main
 
 func getExpenseReport(e expense) (string, float64) {
 	switch v:= e.(type) {
-	case email :
+	case emails :
 		return v.toAddress , v.cost()
 		case sms :
 	return v.toPhoneNumber , v.cost()
@@ -19,7 +19,7 @@ type expense interface {
 	cost() float64
 }
 
-type email struct {
+type emails struct {
 	isSubscribed bool
 	body         string
 	toAddress    string
@@ -33,7 +33,7 @@ type sms struct {
 
 type invalid struct{}
 
-func (e email) cost() float64 {
+func (e emails) cost() float64 {
 	if !e.isSubscribed {
 		return float64(len(e.body)) * .05
 	}
