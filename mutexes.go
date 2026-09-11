@@ -38,7 +38,7 @@ type emailTest struct {
 	count int
 }
 
-func test(sc safeCounter, emailTests []emailTest) {
+func tesst(sc safeCounter, emailTests []emailTest) {
 	emails := make(map[string]struct{})
 
 	var wg sync.WaitGroup
@@ -68,45 +68,3 @@ func test(sc safeCounter, emailTests []emailTest) {
 	fmt.Println("=====================================")
 }
 
-func main() {
-	sc := safeCounter{
-		counts: make(map[string]int),
-		mux:    &sync.RWMutex{},
-	}
-	test(sc, []emailTest{
-		{
-			email: "john@example.com",
-			count: 23,
-		},
-		{
-			email: "john@example.com",
-			count: 29,
-		},
-		{
-			email: "jill@example.com",
-			count: 31,
-		},
-		{
-			email: "jill@example.com",
-			count: 67,
-		},
-	})
-	test(sc, []emailTest{
-		{
-			email: "kaden@example.com",
-			count: 23,
-		},
-		{
-			email: "george@example.com",
-			count: 126,
-		},
-		{
-			email: "kaden@example.com",
-			count: 31,
-		},
-		{
-			email: "george@example.com",
-			count: 453,
-		},
-	})
-}
